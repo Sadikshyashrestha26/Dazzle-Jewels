@@ -12,60 +12,47 @@
 
     <div class="row">
 
-        <!-- Customer Information -->
         <div class="col-md-7">
             <div class="card shadow-sm p-4 mb-4">
-
                 <h4 class="mb-3">Delivery Information</h4>
 
                 <div class="mb-3">
                     <label class="form-label">Full Name</label>
-                    <input type="text"
-                           class="form-control"
-                           value="@user?.FullName"
-                           readonly />
+                    <input type="text" class="form-control"
+                           value="@user?.FullName" readonly />
                 </div>
 
                 <div class="mb-3">
                     <label class="form-label">Email</label>
-                    <input type="email"
-                           class="form-control"
-                           value="@user?.Email"
-                           readonly />
+                    <input type="email" class="form-control"
+                           value="@user?.Email" readonly />
                 </div>
 
                 <div class="mb-3">
                     <label class="form-label">Phone Number</label>
-                    <input type="text"
-                           class="form-control"
-                           value="@user?.PhoneNumber"
-                           readonly />
+                    <input type="text" class="form-control"
+                           value="@user?.PhoneNumber" readonly />
                 </div>
 
                 <div class="mb-3">
                     <label class="form-label">Delivery Address</label>
-                    <textarea class="form-control"
-                              rows="3"
+                    <textarea class="form-control" rows="3"
                               readonly>@user?.Address</textarea>
                 </div>
 
                 <p class="text-muted">
                     To change your delivery details, update your account information.
                 </p>
-
             </div>
         </div>
 
-        <!-- Order Summary -->
         <div class="col-md-5">
             <div class="card shadow-sm p-4">
-
                 <h4 class="mb-3">Order Summary</h4>
 
                 @foreach (var item in Model)
                 {
                     <div class="d-flex justify-content-between mb-3">
-
                         <div>
                             <strong>@item.ProductName</strong>
                             <p class="text-muted mb-0">
@@ -76,7 +63,6 @@
                         <span>
                             Rs. @((item.Price * item.Quantity).ToString("N0"))
                         </span>
-
                     </div>
                 }
 
@@ -87,16 +73,17 @@
                     <h5>Rs. @total.ToString("N0")</h5>
                 </div>
 
-               <form asp-controller="Cart"
-      asp-action="PlaceOrder"
-      method="post">
+                <a asp-controller="Cart"
+                   asp-action="Payment"
+                   class="btn btn-dark w-100 mt-4">
+                    Continue to Payment
+                </a>
 
-    <button type="submit" class="btn btn-dark w-100 mt-4">
-        Place Order
-    </button>
-
-</form>
-
+                <a asp-controller="Cart"
+                   asp-action="Index"
+                   class="btn btn-outline-dark w-100 mt-2">
+                    Back to Cart
+                </a>
             </div>
         </div>
 
