@@ -104,11 +104,29 @@ namespace Dazzle_Jewels.Controllers
                 return View();
             }
 
+           
             HttpContext.Session.SetInt32("UserId", user.UserId);
             HttpContext.Session.SetString("UserName", user.FullName);
             HttpContext.Session.SetString("UserRole", user.Role);
 
+// Redirect based on user role
+            if (user.Role == "Admin")
+            {
+                return RedirectToAction("Dashboard", "Admin");
+            }
+
             return RedirectToAction("Index", "Home");
+         
+        }
+
+        // Logout
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult Logout()
+        {
+            HttpContext.Session.Clear();
+
+            return RedirectToAction("Login");
         }
     }
 }

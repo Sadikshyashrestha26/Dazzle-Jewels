@@ -117,6 +117,23 @@
                                     Welcome, @Context.Session.GetString("UserName")
                                 </span>
                             </li>
+
+                            <!-- Logout Button -->
+                            <li class="nav-item">
+                                <form asp-controller="Account"
+                                      asp-action="Logout"
+                                      method="post"
+                                      class="d-inline">
+
+                                    @Html.AntiForgeryToken()
+
+                                    <button type="submit"
+                                            class="nav-link text-dark border-0 bg-transparent">
+                                        Logout
+                                    </button>
+
+                                </form>
+                            </li>
                         }
 
                     </ul>

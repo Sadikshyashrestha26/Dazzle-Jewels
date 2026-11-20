@@ -1,0 +1,89 @@
+@model DazzleJewels.Models.AdminDashboardViewModel
+@{
+    ViewData["Title"] = "Admin Dashboard";
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dazzle Jewels | Admin Dashboard</title>
+    <link rel="stylesheet" href="~/css/admin.css" />
+</head>
+<body>
+
+<div class="admin-wrapper">
+
+    <aside class="admin-sidebar">
+        <div class="admin-brand">✧ DAZZLE JEWELS</div>
+
+        <h4>Main Menu</h4>
+        <a asp-controller="Admin" asp-action="Dashboard" class="active">
+            Dashboard
+        </a>
+        <a href="#">Manage Products</a>
+        <a href="#">Manage Categories</a>
+
+        <h4>Management</h4>
+        <a href="#">Orders</a>
+        <a href="#">Customers</a>
+
+        <h4>Account</h4>
+        <form asp-controller="Account"
+              asp-action="Logout"
+              method="post">
+            <button type="submit"
+                    style="width:100%; padding:13px 15px; background:none;
+                    border:none; color:white; text-align:left; cursor:pointer;">
+                Logout
+            </button>
+        </form>
+    </aside>
+
+    <main class="admin-main">
+
+        <header class="admin-header">
+            <div>
+                <h1>Dashboard</h1>
+                <p class="admin-subtitle">
+                    Welcome back, @Context.Session.GetString("UserName")!
+                </p>
+            </div>
+
+            <span class="admin-badge">ADMIN PANEL</span>
+        </header>
+
+        
+    <div class="dashboard-cards">
+
+        <div class="dashboard-card">
+            <p>Total Products</p>
+            <h2>@Model.TotalProducts</h2>
+        </div>
+
+        <div class="dashboard-card">
+            <p>Total Orders</p>
+            <h2>@Model.TotalOrders</h2>
+        </div>
+
+        <div class="dashboard-card">
+            <p>Total Customers</p>
+            <h2>@Model.TotalCustomers</h2>
+        </div>
+
+        <div class="dashboard-card">
+            <p>Total Order Value</p>
+            <h2>Rs. @Model.TotalOrderValue.ToString("N2")</h2>
+        </div>
+
+    </div>
+
+        
+
+    </main>
+</div>
+
+</body>
+</html>
