@@ -90,3 +90,45 @@
     <p>Find your perfect piece and shine every day.</p>
     <a href="/Home/Shop" class="promo-btn">Shop Now</a>
 </section>
+
+<!-- Newsletter Section -->
+<section class="newsletter">
+    <div class="newsletter-content">
+
+        <p class="newsletter-subtitle">STAY IN THE SPARKLE</p>
+
+        <h2>A Little Sparkle in Your Inbox</h2>
+
+        <p>
+            Subscribe to our newsletter and be the first to know
+            about new collections, exclusive offers and special updates.
+        </p>
+
+        <form asp-controller="Newsletter"
+              asp-action="Subscribe"
+              method="post">
+
+            @Html.AntiForgeryToken()
+
+            <div class="newsletter-form">
+                <input type="email"
+                       name="email"
+                       placeholder="Enter your email address"
+                       required />
+
+                <button type="submit">Subscribe</button>
+            </div>
+        </form>
+
+        @if (TempData["NewsletterMessage"] != null)
+        {
+            <p class="newsletter-message">
+                @TempData["NewsletterMessage"]
+            </p>
+        }
+
+        <small>We promise not to spam you. Just beautiful updates!</small>
+
+    </div>
+</section>
+

@@ -21,7 +21,8 @@ namespace DazzleJewels.Data
         public DbSet<Order> Orders => Set<Order>();
 
         public DbSet<OrderItem> OrderItems => Set<OrderItem>();
-
+        public DbSet<NewsletterSubscriber> NewsletterSubscribers
+            => Set<NewsletterSubscriber>();
         // Database Relationships
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

@@ -36,6 +36,24 @@ namespace Dazzle_Jewels.Migrations
                     b.ToTable("Categories");
                 });
 
+            modelBuilder.Entity("DazzleJewels.Models.NewsletterSubscriber", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("SubscribedAt")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("NewsletterSubscribers");
+                });
+
             modelBuilder.Entity("DazzleJewels.Models.Order", b =>
                 {
                     b.Property<int>("OrderId")
