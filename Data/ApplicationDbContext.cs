@@ -28,9 +28,9 @@ namespace DazzleJewels.Data
             base.OnModelCreating(modelBuilder);
 
             modelBuilder.Entity<Product>()
-                .HasOne(p => p.Category)
-                .WithMany()
-                .HasForeignKey(p => p.CategoryId);
+    .HasOne(p => p.Category)
+    .WithMany(c => c.Products)
+    .HasForeignKey(p => p.CategoryId);
 
             modelBuilder.Entity<Order>()
                 .HasOne(o => o.User)

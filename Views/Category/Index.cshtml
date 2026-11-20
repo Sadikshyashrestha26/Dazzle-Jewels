@@ -1,0 +1,53 @@
+﻿@model IEnumerable<DazzleJewels.Models.Category>
+
+@{
+    ViewData["Title"] = "Shop by Category";
+}
+
+<section class="category-page">
+
+    <div class="category-heading">
+        <p class="category-subtitle">DISCOVER YOUR STYLE</p>
+        <h1>Explore Our Collections</h1>
+        <p class="category-description">
+            Find the perfect jewellery to express your personality.
+        </p>
+    </div>
+
+    <div class="category-grid">
+
+        @foreach (var category in Model)
+        {
+            var image = category.Products?
+                .FirstOrDefault(p => !string.IsNullOrEmpty(p.ImageUrl))?.ImageUrl;
+
+            <a asp-controller="Category"
+               asp-action="Products"
+               asp-route-name="@category.CategoryName"
+               class="category-card">
+
+                <div class="category-image">
+                    @if (!string.IsNullOrEmpty(image))
+                    {
+                        <img src="@image" alt="@category.CategoryName" />
+                    }
+                    else
+                    {
+                        <div class="category-no-image">
+                            Image coming soon
+                        </div>
+                    }
+                </div>
+
+                <div class="category-card-info">
+                    <h2>@category.CategoryName</h2>
+                    <p>@category.Description</p>
+                    <span>EXPLORE COLLECTION →</span>
+                </div>
+
+            </a>
+        }
+
+    </div>
+
+</section>

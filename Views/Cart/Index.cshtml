@@ -1,0 +1,144 @@
+﻿@model List<DazzleJewels.Models.CartItem>
+
+@{
+    ViewData["Title"] = "My Cart";
+    decimal total = Model.Sum(item => item.Price * item.Quantity);
+}
+
+<div class="container my-5">
+
+    <h1 class="mb-4">My Shopping Cart</h1>
+
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger">
+            @TempData["Error"]
+        </div>
+    }
+
+    @if (!Model.Any())
+    {
+        <div class="text-center py-5">
+            <h3>Your cart is empty!</h3>
+            <p>Explore our jewellery collection and find something you love.</p>
+
+            <a asp-controller="Category"
+               asp-action="Index"
+               class="btn btn-dark">
+                Continue Shopping
+            </a>
+        </div>
+    }
+    else
+    {
+        <div class="table-responsive">
+
+            <table class="table align-middle">
+
+                <thead>
+                    <tr>
+                        <th>Product</th>
+                        <th>Price</th>
+                        <th>Quantity</th>
+                        <th>Subtotal</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+
+                            <td>
+                                <div class="d-flex align-items-center gap-3">
+
+                                    <img src="@item.ImageUrl"
+                                         alt="@item.ProductName"
+                                         style="width:80px;height:80px;object-fit:contain;" />
+
+                                    <span>@item.ProductName</span>
+
+                                </div>
+                            </td>
+
+                            <td>
+                                Rs. @item.Price.ToString("N0")
+                            </td>
+
+                            <td>
+                                <form asp-controller="Cart"
+                                      asp-action="UpdateQuantity"
+                                      method="post"
+                                      class="d-flex gap-2">
+
+                                    <input type="hidden"
+                                           name="id"
+                                           value="@item.ProductId" />
+
+                                    <input type="number"
+                                           name="quantity"
+                                           value="@item.Quantity"
+                                           min="1"
+                                           class="form-control"
+                                           style="width:80px;" />
+
+                                    <button type="submit"
+                                            class="btn btn-outline-dark btn-sm">
+                                        Update
+                                    </button>
+
+                                </form>
+                            </td>
+
+                            <td>
+                                Rs. @((item.Price * item.Quantity).ToString("N0"))
+                            </td>
+
+                            <td>
+                                <form asp-controller="Cart"
+                                      asp-action="RemoveFromCart"
+                                      method="post">
+
+                                    <input type="hidden"
+                                           name="id"
+                                           value="@item.ProductId" />
+
+                                    <button type="submit"
+                                            class="btn btn-outline-danger btn-sm">
+                                        Remove
+                                    </button>
+
+                                </form>
+                            </td>
+
+                        </tr>
+                    }
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+        <div class="text-end mt-4">
+
+            <h4>Total: Rs. @total.ToString("N0")</h4>
+
+            <a asp-controller="Category"
+               asp-action="Index"
+               class="btn btn-outline-dark">
+                Continue Shopping
+            </a>
+
+            <a asp-controller="Cart"
+               asp-action="Checkout"
+               class="btn btn-dark">
+                Proceed to Checkout
+            </a>
+
+        </div>
+    }
+
+</div>

@@ -1,3 +1,4 @@
+
 using System.ComponentModel.DataAnnotations;
 
 namespace DazzleJewels.Models
@@ -22,6 +23,10 @@ namespace DazzleJewels.Models
         public string? PhoneNumber { get; set; }
 
         public string? Address { get; set; }
+
+        // Customer or Admin
+        [Required]
+        public string Role { get; set; } = "Customer";
 
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     }

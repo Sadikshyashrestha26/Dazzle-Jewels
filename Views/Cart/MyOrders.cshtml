@@ -1,0 +1,68 @@
+﻿
+@model List<DazzleJewels.Models.Order>
+
+@{
+    ViewData["Title"] = "My Orders";
+}
+
+<div class="container my-5">
+
+    <h2 class="mb-4">My Orders</h2>
+
+    @if (!Model.Any())
+    {
+        <div class="text-center py-5">
+            <h4>You haven't placed any orders yet.</h4>
+            <p class="text-muted">
+                Your orders will appear here after checkout.
+            </p>
+
+            <a asp-controller="Category"
+               asp-action="Index"
+               class="btn btn-dark">
+                Start Shopping
+            </a>
+        </div>
+    }
+    else
+    {
+        <div class="table-responsive">
+            <table class="table table-bordered align-middle">
+
+                <thead class="table-light">
+                    <tr>
+                        <th>Order ID</th>
+                        <th>Order Date</th>
+                        <th>Total Amount</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    @foreach (var order in Model)
+                    {
+                        <tr>
+                            <td>#@order.OrderId</td>
+
+                            <td>
+                                @order.OrderDate.ToLocalTime().ToString("dd MMM yyyy")
+                            </td>
+
+                            <td>
+                                Rs. @order.TotalAmount.ToString("N0")
+                            </td>
+
+                            <td>
+                                <span class="badge bg-warning text-dark">
+                                    @order.Status
+                                </span>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+
+            </table>
+        </div>
+    }
+
+</div>

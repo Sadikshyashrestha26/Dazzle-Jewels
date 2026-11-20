@@ -1,3 +1,4 @@
+
 using System.ComponentModel.DataAnnotations;
 
 namespace DazzleJewels.Models
@@ -12,5 +13,8 @@ namespace DazzleJewels.Models
         public string CategoryName { get; set; } = string.Empty;
 
         public string? Description { get; set; }
+
+        // Navigation Property
+        public ICollection<Product> Products { get; set; } = new List<Product>();
     }
 }

@@ -1,8 +1,92 @@
 ﻿@{
-    ViewData["Title"] = "Home Page";
+    ViewData["Title"] = "Home";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
-</div>
+<!-- Hero Section -->
+<section class="hero">
+    <div class="hero-content">
+        <p class="hero-subtitle">TIMELESS BEAUTY, EVERYDAY ELEGANCE</p>
+        <h1>Jewellery That<br />Tells Your Story</h1>
+        <p class="hero-description">
+            Discover beautiful jewellery pieces that make
+            every moment special.
+        </p>
+        <a href="/Home/Shop" class="shop-btn">Explore Collection</a>
+    </div>
+</section>
+
+<!-- Categories -->
+<section class="categories">
+    <div class="section-heading">
+        <p>EXPLORE OUR COLLECTION</p>
+        <h2>Shop By Category</h2>
+    </div>
+
+    <div class="category-container">
+
+        <div class="category-card">
+            <img src="https://i.pinimg.com/736x/2a/bd/76/2abd76b26474f60409f605101d01498a.jpg"
+                 alt="Earrings" />
+            <h3>Earrings</h3>
+        </div>
+
+        <div class="category-card">
+            <img src="https://i.pinimg.com/736x/17/bc/5c/17bc5c2652efd9c37c1e6fe1e2356759.jpg"
+                 alt="Necklaces" />
+            <h3>Necklaces</h3>
+        </div>
+
+        <div class="category-card">
+            <img src="https://i.pinimg.com/736x/0f/45/12/0f4512db3a054e63402e1751fb0a247d.jpg"
+                 alt="Bracelets" />
+            <h3>Bracelets</h3>
+        </div>
+
+        <div class="category-card">
+            <img src="https://i.pinimg.com/1200x/52/4d/3b/524d3b243ad4b4308b1e315d43d51aad.jpg"
+                 alt="Rings" />
+            <h3>Rings</h3>
+        </div>
+
+    </div>
+</section>
+
+<!-- Featured Products -->
+<section class="featured">
+    <div class="section-heading">
+        <p>HANDPICKED FOR YOU</p>
+        <h2>Featured Collection</h2>
+    </div>
+
+    <div class="product-container">
+
+        <div class="product-card">
+            <img src="https://images.unsplash.com/photo-1617038220319-276d3cfab638?w=600"
+                 alt="Elegant necklace" />
+            <h3>Elegant Necklace</h3>
+            <p>NPR 1,500</p>
+        </div>
+
+        <div class="product-card">
+            <img src="https://images.unsplash.com/photo-1611591437281-460bfbe1220a?w=600"
+                 alt="Golden Bracelet" />
+            <h3>Golden Bracelet</h3>
+            <p>NPR 1,200</p>
+        </div>
+
+        <div class="product-card">
+            <img src="https://images.unsplash.com/photo-1603561596112-0a132b757442?w=600"
+                 alt="Beautiful earrings" />
+            <h3>Classic Earrings</h3>
+            <p>NPR 950</p>
+        </div>
+
+    </div>
+</section>
+
+<!-- Promotional Banner -->
+<section class="promo">
+    <h2>Elegance Never Goes Out of Style</h2>
+    <p>Find your perfect piece and shine every day.</p>
+    <a href="/Home/Shop" class="promo-btn">Shop Now</a>
+</section>

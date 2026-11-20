@@ -1,0 +1,99 @@
+@model DazzleJewels.Models.Category
+
+@{
+    ViewData["Title"] = Model.CategoryName;
+}
+
+<section class="category-products">
+
+    <div class="category-heading">
+        <p>DAZZLE JEWELS COLLECTION</p>
+        <h1>@Model.CategoryName</h1>
+        <p>@Model.Description</p>
+    </div>
+
+    <!-- Product Search -->
+    <form asp-controller="Category"
+          asp-action="Products"
+          asp-route-name="@Model.CategoryName"
+          method="get"
+          class="mb-4">
+
+        <input type="text"
+               name="search"
+               value="@ViewBag.Search"
+               placeholder="Search products..."
+               class="form-control"
+               style="max-width:400px; display:inline-block;" />
+
+        <button type="submit" class="btn btn-dark">
+            Search
+        </button>
+
+        <a asp-controller="Category"
+           asp-action="Products"
+           asp-route-name="@Model.CategoryName"
+           class="btn btn-outline-dark">
+            Clear
+        </a>
+
+    </form>
+
+    <div class="product-grid">
+
+        @if (!Model.Products.Any())
+        {
+            <p>No products found.</p>
+        }
+        else
+        {
+            @foreach (var product in Model.Products)
+            {
+                <div class="product-card">
+
+                    <div class="product-image">
+                        <img src="@product.ImageUrl"
+                             alt="@product.ProductName" />
+                    </div>
+
+                    <div class="product-info">
+
+                        <h3>@product.ProductName</h3>
+
+                        <p class="product-price">
+                            Rs. @product.Price.ToString("N0")
+                        </p>
+
+                        <p class="stock-info">
+                            @product.StockQuantity items left
+                        </p>
+
+                        <form asp-controller="Cart"
+                              asp-action="AddToCart"
+                              method="post">
+
+                            <input type="hidden"
+                                   name="id"
+                                   value="@product.ProductId" />
+
+                            <button class="add-cart-btn" type="submit">
+                                Add to Cart
+                            </button>
+
+                        </form>
+
+                    </div>
+
+                </div>
+            }
+        }
+
+    </div>
+
+    <a asp-controller="Category"
+       asp-action="Index"
+       class="back-link">
+        ← Back to Categories
+    </a>
+
+</section>
