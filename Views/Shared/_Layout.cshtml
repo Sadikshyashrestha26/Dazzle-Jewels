@@ -6,7 +6,15 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-    <title>@ViewData["Title"] - Dazzle_Jewels</title>
+    <title>@(ViewData["Title"] ?? "Home") - Dazzle Jewels</title>
+
+    <meta name="description"
+          content="@(ViewData["Description"] ?? "Discover beautiful jewellery at Dazzle Jewels.")" />
+
+    <meta name="keywords"
+          content="Dazzle Jewels, jewellery, earrings, necklaces, rings, bracelets, pendants" />
+
+    <meta name="robots" content="index, follow" />
 
     <script type="importmap"></script>
 
@@ -165,6 +173,31 @@
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
+
+    <!-- Visitor Tracking Script -->
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+
+            fetch("/api/Tracking/track", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    pagePath: window.location.pathname
+                })
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        console.error("Page tracking failed");
+                    }
+                })
+                .catch(error => {
+                    console.error("Tracking error:", error);
+                });
+
+        });
+    </script>
 
     @await RenderSectionAsync("Scripts", required: false)
 

@@ -1,8 +1,13 @@
 ﻿@model List<DazzleJewels.Models.CartItem>
 
 @{
-    ViewData["Title"] = "My Cart";
+    ViewData["Title"] = "ShoppingCart";
+    ViewData["Description"] = "Review your selected jewellery items in your Dazzle Jewels shopping cart.";
+
     decimal total = Model.Sum(item => item.Price * item.Quantity);
+
+    var recommendedProducts = ViewBag.RecommendedProducts
+        as List<DazzleJewels.Models.Product>;
 }
 
 <div class="container my-5">
@@ -137,6 +142,73 @@
                class="btn btn-dark">
                 Proceed to Checkout
             </a>
+
+        </div>
+    }
+
+    @* Recommended Products Section *@
+
+    @if (recommendedProducts != null && recommendedProducts.Any())
+    {
+        <hr class="my-5" />
+
+        <div class="mb-4">
+            <h2>You May Also Like</h2>
+            <p>Discover more jewellery from your selected categories.</p>
+        </div>
+
+        <div class="product-grid">
+
+            @foreach (var product in recommendedProducts)
+            {
+                <div class="product-card">
+
+                    <div class="product-image">
+
+                        <a asp-controller="Category"
+                           asp-action="Details"
+                           asp-route-id="@product.ProductId">
+
+                            <img src="@product.ImageUrl"
+                                 alt="@product.ProductName" />
+
+                        </a>
+
+                    </div>
+
+                    <div class="product-info">
+
+                        <h3>
+                            <a asp-controller="Category"
+                               asp-action="Details"
+                               asp-route-id="@product.ProductId"
+                               style="text-decoration:none;color:inherit;">
+                                @product.ProductName
+                            </a>
+                        </h3>
+
+                        <p class="product-price">
+                            Rs. @product.Price.ToString("N0")
+                        </p>
+
+                        <form asp-controller="Cart"
+                              asp-action="AddToCart"
+                              method="post">
+
+                            <input type="hidden"
+                                   name="id"
+                                   value="@product.ProductId" />
+
+                            <button type="submit" class="add-cart-btn">
+                                Add to Cart
+                            </button>
+
+                        </form>
+
+                    </div>
+
+                </div>
+            }
 
         </div>
     }

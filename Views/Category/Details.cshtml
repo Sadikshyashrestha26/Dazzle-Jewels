@@ -1,0 +1,117 @@
+﻿@model DazzleJewels.Models.Product
+
+@{
+    ViewData["Title"] = Model.ProductName;
+    ViewData["Description"] = $"Discover {Model.ProductName} at Dazzle Jewels.";
+    var relatedProducts = ViewBag.RelatedProducts
+        as List<DazzleJewels.Models.Product>;
+}
+
+<section class="category-products">
+
+    <div class="category-heading">
+        <p>DAZZLE JEWELS COLLECTION</p>
+        <h1>@Model.ProductName</h1>
+    </div>
+
+    <div class="product-grid">
+
+        <div class="product-card">
+
+            <div class="product-image">
+                <img src="@Model.ImageUrl"
+                     alt="@Model.ProductName" />
+            </div>
+
+            <div class="product-info">
+
+                <h3>@Model.ProductName</h3>
+
+                <p class="product-price">
+                    Rs. @Model.Price.ToString("N0")
+                </p>
+
+                <p class="stock-info">
+                    @Model.StockQuantity items left
+                </p>
+
+                <form asp-controller="Cart"
+                      asp-action="AddToCart"
+                      method="post">
+
+                    <input type="hidden"
+                           name="id"
+                           value="@Model.ProductId" />
+
+                    <button class="add-cart-btn" type="submit">
+                        Add to Cart
+                    </button>
+
+                </form>
+
+            </div>
+        </div>
+
+    </div>
+
+    <hr />
+
+    <div class="category-heading">
+        <h2>Related Products</h2>
+        <p>You may also like these products.</p>
+    </div>
+
+    <div class="product-grid">
+
+        @if (relatedProducts == null || !relatedProducts.Any())
+        {
+            <p>No related products available.</p>
+        }
+        else
+        {
+            @foreach (var item in relatedProducts)
+            {
+                <div class="product-card">
+
+                    <a asp-controller="Category"
+                       asp-action="Details"
+                       asp-route-id="@item.ProductId">
+
+                        <div class="product-image">
+                            <img src="@item.ImageUrl"
+                                 alt="@item.ProductName" />
+                        </div>
+
+                    </a>
+
+                    <div class="product-info">
+
+                        <h3>@item.ProductName</h3>
+
+                        <p class="product-price">
+                            Rs. @item.Price.ToString("N0")
+                        </p>
+
+                        <a asp-controller="Category"
+                           asp-action="Details"
+                           asp-route-id="@item.ProductId"
+                           class="btn btn-outline-dark">
+                            View Product
+                        </a>
+
+                    </div>
+
+                </div>
+            }
+        }
+
+    </div>
+
+    <a asp-controller="Category"
+       asp-action="Products"
+       asp-route-name="@Model.Category?.CategoryName"
+       class="back-link">
+        ← Back to Category
+    </a>
+
+</section>

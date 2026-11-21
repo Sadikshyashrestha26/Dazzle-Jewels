@@ -1,7 +1,10 @@
 @model DazzleJewels.Models.Category
 
 @{
-    ViewData["Title"] = Model.CategoryName;
+    ViewData["Title"] = Model.CategoryName + " Collection";
+
+    ViewData["Description"] =
+        $"Explore {Model.CategoryName} at Dazzle Jewels. {Model.Description}";
 }
 
 <section class="category-products">
@@ -52,13 +55,26 @@
                 <div class="product-card">
 
                     <div class="product-image">
-                        <img src="@product.ImageUrl"
-                             alt="@product.ProductName" />
+                        <a asp-controller="Category"
+                           asp-action="Details"
+                           asp-route-id="@product.ProductId">
+
+                            <img src="@product.ImageUrl"
+                                 alt="@product.ProductName" />
+
+                        </a>
                     </div>
 
                     <div class="product-info">
 
-                        <h3>@product.ProductName</h3>
+                        <h3>
+                            <a asp-controller="Category"
+                               asp-action="Details"
+                               asp-route-id="@product.ProductId"
+                               style="text-decoration:none; color:inherit;">
+                                @product.ProductName
+                            </a>
+                        </h3>
 
                         <p class="product-price">
                             Rs. @product.Price.ToString("N0")

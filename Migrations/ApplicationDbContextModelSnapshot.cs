@@ -90,6 +90,24 @@ namespace Dazzle_Jewels.Migrations
                     b.ToTable("OrderItems");
                 });
 
+            modelBuilder.Entity("DazzleJewels.Models.PageView", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("PagePath")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("ViewedAt")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("PageViews");
+                });
+
             modelBuilder.Entity("DazzleJewels.Models.Product", b =>
                 {
                     b.Property<int>("ProductId")

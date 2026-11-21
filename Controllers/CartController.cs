@@ -53,10 +53,34 @@ namespace Dazzle_Jewels.Controllers
             return RedirectToAction("Index");
         }
 
-        // Display cart
-        public IActionResult Index()
+        // Display cart with recommended products
+        public async Task<IActionResult> Index()
         {
             var cart = GetCart();
+
+            var cartProductIds = cart
+                .Select(p => p.ProductId)
+                .ToList();
+
+            // Find categories of products in the cart
+            var categoryIds = await _context.Products
+                .Where(p => cartProductIds.Contains(p.ProductId))
+                .Select(p => p.CategoryId)
+                .Distinct()
+                .ToListAsync();
+
+            // Find other products from the same categories
+            var recommendedProducts = await _context.Products
+                .Where(p =>
+                    categoryIds.Contains(p.CategoryId) &&
+                    !cartProductIds.Contains(p.ProductId) &&
+                    p.StockQuantity > 0)
+                .OrderBy(p => p.ProductName)
+                .Take(4)
+                .ToListAsync();
+
+            ViewBag.RecommendedProducts = recommendedProducts;
+
             return View(cart);
         }
 

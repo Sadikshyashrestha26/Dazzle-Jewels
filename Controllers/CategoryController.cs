@@ -53,5 +53,29 @@ namespace Dazzle_Jewels.Controllers
 
             return View("Products", category);
         }
+
+        // Display individual product details with related products
+        public async Task<IActionResult> Details(int id)
+        {
+            var product = await _context.Products
+                .Include(p => p.Category)
+                .FirstOrDefaultAsync(p => p.ProductId == id);
+
+            if (product == null)
+            {
+                return NotFound();
+            }
+
+            // Find other products from the same category
+            var relatedProducts = await _context.Products
+                .Where(p => p.CategoryId == product.CategoryId
+                            && p.ProductId != product.ProductId)
+                .ToListAsync();
+
+            ViewBag.RelatedProducts = relatedProducts;
+
+            return View(product);
+        }
     }
 }
+

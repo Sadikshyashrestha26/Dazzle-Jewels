@@ -1,3 +1,4 @@
+
 using Microsoft.EntityFrameworkCore;
 using DazzleJewels.Models;
 
@@ -22,15 +23,18 @@ namespace DazzleJewels.Data
 
         public DbSet<OrderItem> OrderItems => Set<OrderItem>();
 
+        // Visitor Tracking Table
+        public DbSet<PageView> PageViews => Set<PageView>();
+
         // Database Relationships
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
 
             modelBuilder.Entity<Product>()
-    .HasOne(p => p.Category)
-    .WithMany(c => c.Products)
-    .HasForeignKey(p => p.CategoryId);
+                .HasOne(p => p.Category)
+                .WithMany(c => c.Products)
+                .HasForeignKey(p => p.CategoryId);
 
             modelBuilder.Entity<Order>()
                 .HasOne(o => o.User)

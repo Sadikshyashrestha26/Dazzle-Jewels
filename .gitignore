@@ -3,3 +3,12 @@ obj/
 /packages/
 riderModule.iml
 /_ReSharper.Caches/
+
+# SQLite database files
+*.db
+*.db-shm
+*.db-wal
+
+# Visual Studio local files
+.vs/
+*.csproj.user
