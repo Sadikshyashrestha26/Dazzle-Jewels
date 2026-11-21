@@ -4,6 +4,10 @@ obj/
 riderModule.iml
 /_ReSharper.Caches/
 
+# macOS files
+.DS_Store
+**/.DS_Store
+
 # SQLite database files
 *.db
 *.db-shm

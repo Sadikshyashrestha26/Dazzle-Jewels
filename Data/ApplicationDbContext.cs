@@ -23,6 +23,10 @@ namespace DazzleJewels.Data
 
         public DbSet<OrderItem> OrderItems => Set<OrderItem>();
 
+        // Newsletter Subscribers Table
+        public DbSet<NewsletterSubscriber> NewsletterSubscribers
+            => Set<NewsletterSubscriber>();
+
         // Visitor Tracking Table
         public DbSet<PageView> PageViews => Set<PageView>();
 
@@ -47,7 +51,7 @@ namespace DazzleJewels.Data
                 .HasForeignKey(oi => oi.OrderId);
 
             modelBuilder.Entity<OrderItem>()
-                .HasOne(oi => oi.Product)
+                .HasOne(oi => oi.Product)S
                 .WithMany()
                 .HasForeignKey(oi => oi.ProductId);
         }

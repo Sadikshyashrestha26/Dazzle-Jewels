@@ -5,7 +5,7 @@ using System.Text.Json;
 using DazzleJewels.Data;
 using DazzleJewels.Models;
 
-namespace Dazzle_Jewels.Controllers
+namespace DazzleJewels.Controllers
 {
     public class CartController : Controller
     {
@@ -20,16 +20,13 @@ namespace Dazzle_Jewels.Controllers
         [HttpPost]
         public async Task<IActionResult> AddToCart(int id)
         {
-            var product = await _context.Products
-                .FirstOrDefaultAsync(p => p.ProductId == id);
+            var product = await _context.Products.FindAsync(id);
 
             if (product == null)
                 return NotFound();
 
             var cart = GetCart();
-
-            var existingItem = cart.FirstOrDefault(
-                p => p.ProductId == id);
+            var existingItem = cart.FirstOrDefault(c => c.ProductId == id);
 
             if (existingItem != null)
             {
@@ -49,7 +46,6 @@ namespace Dazzle_Jewels.Controllers
             }
 
             SaveCart(cart);
-
             return RedirectToAction("Index");
         }
 
@@ -62,14 +58,12 @@ namespace Dazzle_Jewels.Controllers
                 .Select(p => p.ProductId)
                 .ToList();
 
-            // Find categories of products in the cart
             var categoryIds = await _context.Products
                 .Where(p => cartProductIds.Contains(p.ProductId))
                 .Select(p => p.CategoryId)
                 .Distinct()
                 .ToListAsync();
 
-            // Find other products from the same categories
             var recommendedProducts = await _context.Products
                 .Where(p =>
                     categoryIds.Contains(p.CategoryId) &&
@@ -84,26 +78,25 @@ namespace Dazzle_Jewels.Controllers
             return View(cart);
         }
 
-        // Get cart from session
+        // Read cart from session
         private List<CartItem> GetCart()
         {
             var cartJson = HttpContext.Session.GetString("Cart");
 
-            if (string.IsNullOrEmpty(cartJson))
-                return new List<CartItem>();
-
-            return JsonSerializer.Deserialize<List<CartItem>>(cartJson)
-                   ?? new List<CartItem>();
+            return string.IsNullOrEmpty(cartJson)
+                ? new List<CartItem>()
+                : JsonSerializer.Deserialize<List<CartItem>>(cartJson)
+                    ?? new List<CartItem>();
         }
 
         // Save cart to session
         private void SaveCart(List<CartItem> cart)
         {
-            var cartJson = JsonSerializer.Serialize(cart);
-            HttpContext.Session.SetString("Cart", cartJson);
+            HttpContext.Session.SetString("Cart",
+                JsonSerializer.Serialize(cart));
         }
 
-        // Display Checkout page
+        // Checkout page
         [HttpGet]
         public async Task<IActionResult> Checkout()
         {
@@ -114,11 +107,10 @@ namespace Dazzle_Jewels.Controllers
 
             var cart = GetCart();
 
-            if (cart.Count == 0)
+            if (!cart.Any())
                 return RedirectToAction("Index");
 
-            var user = await _context.Users
-                .FirstOrDefaultAsync(u => u.UserId == userId.Value);
+            var user = await _context.Users.FindAsync(userId.Value);
 
             if (user == null)
                 return RedirectToAction("Login", "Account");
@@ -128,10 +120,9 @@ namespace Dazzle_Jewels.Controllers
             return View(cart);
         }
 
-        // Place order with database transaction and rollback
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> PlaceOrder()
+        // Dummy payment gateway page
+        [HttpGet]
+        public async Task<IActionResult> Payment()
         {
             var userId = HttpContext.Session.GetInt32("UserId");
 
@@ -140,102 +131,195 @@ namespace Dazzle_Jewels.Controllers
 
             var cart = GetCart();
 
-            if (cart.Count == 0)
+            if (!cart.Any())
                 return RedirectToAction("Index");
 
-            // Start database transaction
+            var user = await _context.Users.FindAsync(userId.Value);
+
+            if (user == null)
+                return RedirectToAction("Login", "Account");
+
+            ViewBag.User = user;
+            ViewBag.TotalAmount = cart.Sum(item =>
+                item.Price * item.Quantity);
+
+            return View(cart);
+        }
+
+        // Process simulated payment
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ProcessPayment(
+            string paymentResult,
+            string paymentMethod = "Demo Payment")
+        {
+            var userId = HttpContext.Session.GetInt32("UserId");
+
+            if (userId == null)
+                return RedirectToAction("Login", "Account");
+
+            var cart = GetCart();
+
+            if (!cart.Any())
+                return RedirectToAction("Index");
+
+            if (paymentResult != "success" && paymentResult != "failure")
+                return BadRequest();
+
+            var transactionId = "DZ-" +
+                Guid.NewGuid().ToString("N")[..12].ToUpper();
+
+            var paymentDate = DateTime.Now.ToString("dd MMM yyyy, hh:mm tt");
+
+            // Calculate amount using current database prices
+            var productIds = cart.Select(item => item.ProductId).ToList();
+
+            var products = await _context.Products
+                .Where(p => productIds.Contains(p.ProductId))
+                .ToListAsync();
+
+            if (products.Count != cart.Count)
+                return RedirectToAction("Index");
+
+            decimal total = 0;
+
+            foreach (var item in cart)
+            {
+                var product = products.First(p =>
+                    p.ProductId == item.ProductId);
+
+                total += product.Price * item.Quantity;
+            }
+
+            // Simulate failed payment
+            if (paymentResult == "failure")
+            {
+                TempData["PaymentStatus"] = "Failed";
+                TempData["PaymentMessage"] =
+                    "Your payment could not be processed. Please try again.";
+                TempData["TotalAmount"] = total.ToString("N2");
+                TempData["TransactionId"] = transactionId;
+                TempData["PaymentDate"] = paymentDate;
+                TempData["PaymentMethod"] = paymentMethod;
+
+                return RedirectToAction("Confirmation");
+            }
+
+            // Simulate successful payment
             await using var transaction =
                 await _context.Database.BeginTransactionAsync();
 
             try
             {
-                var products = new List<Product>();
-
-                // Check stock availability
+                // Check stock again before confirming the order
                 foreach (var item in cart)
                 {
-                    var product = await _context.Products
-                        .FirstOrDefaultAsync(
-                            p => p.ProductId == item.ProductId);
+                    var product = products.First(p =>
+                        p.ProductId == item.ProductId);
 
-                    if (product == null ||
-                        product.StockQuantity < item.Quantity)
+                    if (product.StockQuantity < item.Quantity)
                     {
                         await transaction.RollbackAsync();
 
-                        TempData["Error"] =
-                            $"Insufficient stock for {item.ProductName}.";
+                        TempData["PaymentStatus"] = "Failed";
+                        TempData["PaymentMessage"] =
+                            $"Insufficient stock for {product.ProductName}. Please update your cart.";
+                        TempData["TotalAmount"] = total.ToString("N2");
+                        TempData["TransactionId"] = transactionId;
+                        TempData["PaymentDate"] = paymentDate;
+                        TempData["PaymentMethod"] = paymentMethod;
 
-                        return RedirectToAction("Index");
+                        return RedirectToAction("Confirmation");
                     }
-
-                    products.Add(product);
                 }
 
-                // Calculate total amount
-                decimal total = products.Sum(p =>
-                    p.Price * cart.First(
-                        c => c.ProductId == p.ProductId).Quantity);
-
-                // Create order
                 var order = new Order
                 {
                     UserId = userId.Value,
                     TotalAmount = total,
                     OrderDate = DateTime.UtcNow,
-                    Status = "Pending"
+                    Status = "Paid"
                 };
 
                 _context.Orders.Add(order);
                 await _context.SaveChangesAsync();
 
-                // Create order items and update stock
-                foreach (var product in products)
+                foreach (var item in cart)
                 {
-                    var cartItem = cart.First(
-                        c => c.ProductId == product.ProductId);
+                    var product = products.First(p =>
+                        p.ProductId == item.ProductId);
 
                     var orderItem = new OrderItem
                     {
                         OrderId = order.OrderId,
                         ProductId = product.ProductId,
-                        Quantity = cartItem.Quantity,
+                        Quantity = item.Quantity,
                         UnitPrice = product.Price
                     };
 
                     _context.OrderItems.Add(orderItem);
 
-                    product.StockQuantity -= cartItem.Quantity;
+                    product.StockQuantity -= item.Quantity;
                 }
 
                 await _context.SaveChangesAsync();
-
-                // Commit transaction if everything succeeds
                 await transaction.CommitAsync();
 
+                // Clear cart after successful payment
                 HttpContext.Session.Remove("Cart");
 
-                TempData["OrderSuccess"] =
-                    "Your order has been placed successfully!";
+                // Store receipt details in TempData
+                TempData["PaymentStatus"] = "Success";
+                TempData["PaymentMessage"] =
+                    "Your payment has been processed successfully.";
+                TempData["OrderId"] = order.OrderId;
+                TempData["TotalAmount"] = total.ToString("N2");
+                TempData["TransactionId"] = transactionId;
+                TempData["PaymentDate"] = paymentDate;
+                TempData["PaymentMethod"] = paymentMethod;
 
                 return RedirectToAction("Confirmation");
             }
             catch
             {
-                // Rollback all database changes if an error occurs
                 await transaction.RollbackAsync();
-
                 throw;
             }
         }
 
-        // Order confirmation page
+        // Payment receipt / result page
+        [HttpGet]
         public IActionResult Confirmation()
         {
+            ViewBag.PaymentStatus =
+                TempData["PaymentStatus"]?.ToString();
+
+            ViewBag.PaymentMessage =
+                TempData["PaymentMessage"]?.ToString();
+
+            ViewBag.OrderId =
+                TempData["OrderId"]?.ToString();
+
+            ViewBag.TotalAmount =
+                TempData["TotalAmount"]?.ToString();
+
+            ViewBag.TransactionId =
+                TempData["TransactionId"]?.ToString();
+
+            ViewBag.PaymentDate =
+                TempData["PaymentDate"]?.ToString();
+
+            ViewBag.PaymentMethod =
+                TempData["PaymentMethod"]?.ToString();
+
+            if (ViewBag.PaymentStatus == null)
+                return RedirectToAction("Index");
+
             return View();
         }
 
-        // Display customer's order history
+        // View user's previous orders
+        [HttpGet]
         public async Task<IActionResult> MyOrders()
         {
             var userId = HttpContext.Session.GetInt32("UserId");
@@ -251,60 +335,44 @@ namespace Dazzle_Jewels.Controllers
             return View(orders);
         }
 
-        // Update product quantity in cart
+        // Update cart quantity
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> UpdateQuantity(
-            int id, int quantity)
+        public async Task<IActionResult> UpdateQuantity(int id, int quantity)
         {
             var cart = GetCart();
+            var item = cart.FirstOrDefault(c => c.ProductId == id);
 
-            var item = cart.FirstOrDefault(
-                p => p.ProductId == id);
-
-            if (item == null)
-                return NotFound();
-
-            if (quantity <= 0)
+            if (item != null)
             {
-                cart.Remove(item);
-            }
-            else
-            {
-                var product = await _context.Products
-                    .FirstOrDefaultAsync(p => p.ProductId == id);
+                var product = await _context.Products.FindAsync(id);
 
                 if (product == null)
-                    return NotFound();
-
-                if (quantity > product.StockQuantity)
                 {
-                    TempData["Error"] =
-                        $"Only {product.StockQuantity} items are available.";
-
-                    return RedirectToAction("Index");
+                    cart.Remove(item);
                 }
-
-                item.Quantity = quantity;
+                else if (quantity <= 0)
+                {
+                    cart.Remove(item);
+                }
+                else if (quantity <= product.StockQuantity)
+                {
+                    item.Quantity = quantity;
+                }
             }
 
             SaveCart(cart);
-
             return RedirectToAction("Index");
         }
 
-        // Remove product from cart
+        // Remove item from cart
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult RemoveFromCart(int id)
         {
             var cart = GetCart();
 
-            var item = cart.FirstOrDefault(
-                p => p.ProductId == id);
-
-            if (item != null)
-                cart.Remove(item);
+            cart.RemoveAll(item => item.ProductId == id);
 
             SaveCart(cart);
 
